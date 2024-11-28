@@ -1,0 +1,2 @@
+# kir-pamekasan
+yii, postgresql
