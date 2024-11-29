@@ -30,7 +30,7 @@ function getInformationRem() {
   var id_hasil_uji = row.id_hasil_uji;
   var posisi = row.posisi;
   var no_antrian = row.no_antrian;
-  var tipe = row.id_jns_kend;
+  var jbb = row.jbb;
   //==================================
   var sumbu1 = row.bsumbu1;
   var sumbu2 = row.bsumbu2;
@@ -40,6 +40,7 @@ function getInformationRem() {
   $("#bsumbu2").val(sumbu2);
   $("#bsumbu3").val(sumbu3);
   $("#bsumbu4").val(sumbu4);
+  $("#jbb").val(jbb);
   //==================================
 
   $("#no_kendaraan_rem").val(no_kendaraan);
@@ -68,45 +69,45 @@ function getInformationRem() {
   $("#bsb4kn").prop("readonly", false);
   $("#bsb4kn").css("background-color", "#fff");
 
-  if (tipe == 5) {
-    $("#bsb1kr").val(0);
-    $("#bsb1kn").val(0);
-    $("#bsb1kr").prop("readonly", true);
-    $("#bsb1kr").css("background-color", "#eaeae1");
-    $("#bsb1kn").prop("readonly", true);
-    $("#bsb1kn").css("background-color", "#eaeae1");
+  // if (tipe == 5) {
+  //   $("#bsb1kr").val(0);
+  //   $("#bsb1kn").val(0);
+  //   $("#bsb1kr").prop("readonly", true);
+  //   $("#bsb1kr").css("background-color", "#eaeae1");
+  //   $("#bsb1kn").prop("readonly", true);
+  //   $("#bsb1kn").css("background-color", "#eaeae1");
 
-    if (sumbu2 == "0" || sumbu2 == "") {
-      $("#bsb2").val(0);
-      $("#bsel2").val(0);
-      $("#bsb2kr").val(0);
-      $("#bsb2kn").val(0);
-      $("#bsb2kr").prop("readonly", true);
-      $("#bsb2kr").css("background-color", "#eaeae1");
-      $("#bsb2kn").prop("readonly", true);
-      $("#bsb2kn").css("background-color", "#eaeae1");
-    }
-    if (sumbu3 == "0" || sumbu3 == "") {
-      $("#bsb3").val(0);
-      $("#bsel3").val(0);
-      $("#bsb3kr").val(0);
-      $("#bsb3kn").val(0);
-      $("#bsb3kr").prop("readonly", true);
-      $("#bsb3kr").css("background-color", "#eaeae1");
-      $("#bsb3kn").prop("readonly", true);
-      $("#bsb3kn").css("background-color", "#eaeae1");
-    }
-    if (sumbu4 == "0" || sumbu4 == "") {
-      $("#bsb4").val(0);
-      $("#bsel4").val(0);
-      $("#bsb4kr").val(0);
-      $("#bsb4kn").val(0);
-      $("#bsb4kr").prop("readonly", true);
-      $("#bsb4kr").css("background-color", "#eaeae1");
-      $("#bsb4kn").prop("readonly", true);
-      $("#bsb4kn").css("background-color", "#eaeae1");
-    }
-  } else {
+  //   if (sumbu2 == "0" || sumbu2 == "") {
+  //     $("#bsb2").val(0);
+  //     $("#bsel2").val(0);
+  //     $("#bsb2kr").val(0);
+  //     $("#bsb2kn").val(0);
+  //     $("#bsb2kr").prop("readonly", true);
+  //     $("#bsb2kr").css("background-color", "#eaeae1");
+  //     $("#bsb2kn").prop("readonly", true);
+  //     $("#bsb2kn").css("background-color", "#eaeae1");
+  //   }
+  //   if (sumbu3 == "0" || sumbu3 == "") {
+  //     $("#bsb3").val(0);
+  //     $("#bsel3").val(0);
+  //     $("#bsb3kr").val(0);
+  //     $("#bsb3kn").val(0);
+  //     $("#bsb3kr").prop("readonly", true);
+  //     $("#bsb3kr").css("background-color", "#eaeae1");
+  //     $("#bsb3kn").prop("readonly", true);
+  //     $("#bsb3kn").css("background-color", "#eaeae1");
+  //   }
+  //   if (sumbu4 == "0" || sumbu4 == "") {
+  //     $("#bsb4").val(0);
+  //     $("#bsel4").val(0);
+  //     $("#bsb4kr").val(0);
+  //     $("#bsb4kn").val(0);
+  //     $("#bsb4kr").prop("readonly", true);
+  //     $("#bsb4kr").css("background-color", "#eaeae1");
+  //     $("#bsb4kn").prop("readonly", true);
+  //     $("#bsb4kn").css("background-color", "#eaeae1");
+  //   }
+  // } else {
     $("#bsb1kr").prop("readonly", false);
     $("#bsb1kr").css("background-color", "#fff");
     $("#bsb1kn").prop("readonly", false);
@@ -152,11 +153,12 @@ function getInformationRem() {
       $("#bsb4kn").prop("readonly", true);
       $("#bsb4kn").css("background-color", "#eaeae1");
     }
-  }
+  // }
 }
 
 function reloadDataRem(urlAct) {
   var tahun_kendaraan = $("#tahun_rem").val();
+  var jbb = $("#jbb").val();
   var row = $("#remListGrid").datagrid("getSelected");
   var tipe = row.id_jns_kend;
   var sumbu1 = row.bsumbu1;
@@ -166,7 +168,7 @@ function reloadDataRem(urlAct) {
   $.ajax({
     type: "POST",
     url: urlAct,
-    data: { tahun_kendaraan: tahun_kendaraan },
+    data: { tahun_kendaraan: tahun_kendaraan, jbb: jbb },
     dataType: "JSON",
     success: function (data) {
       var kiri1 = Math.round((data.kiri1 / 100) * sumbu1);
@@ -181,35 +183,15 @@ function reloadDataRem(urlAct) {
       var selisih_sumbu2 = Math.ceil(((kanan2 - kiri2) / sumbu2) * 100);
       var selisih_sumbu3 = Math.ceil(((kanan3 - kiri3) / sumbu3) * 100);
       var selisih_sumbu4 = Math.ceil(((kanan4 - kiri4) / sumbu4) * 100);
-      if (tipe == 5) {
-        if (sumbu2 == "0" || sumbu2 == "") {
-          $("#bsb2").val(0);
-          $("#bsel2").val(0);
-        } else {
-          $("#bsb2").val(data.bsb2);
-          $("#bsel2").val(selisih_sumbu2);
-          $("#bsb2kr").val(kiri2);
-          $("#bsb2kn").val(kanan2);
-        }
-        if (sumbu3 == "0" || sumbu3 == "") {
-          $("#bsb3").val(0);
-          $("#bsel3").val(0);
-        } else {
-          $("#bsb3").val(data.bsb3);
-          $("#bsel3").val(selisih_sumbu3);
-          $("#bsb3kr").val(kiri3);
-          $("#bsb3kn").val(kanan3);
-        }
-        if (sumbu4 == "0" || sumbu4 == "") {
-          $("#bsb4").val(0);
-          $("#bsel4").val(0);
-        } else {
-          $("#bsb4").val(data.bsb4);
-          $("#bsel4").val(selisih_sumbu4);
-          $("#bsb4kr").val(kiri4);
-          $("#bsb4kn").val(kanan4);
-        }
-      } else {
+      var parkir_kanan = data.parkir_kanan;
+      var parkir_kiri = data.parkir_kiri;
+      $("#tangan_kanan").val(parkir_kanan);
+      $("#tangan_kiri").val(parkir_kiri);
+      $("#form_efisiensi_tangan").val(data.efisiensi);
+      $("#efisiensi_tangan").text(data.efisiensi);
+      perhitunganRemParkir();
+      console.log(data.efisiensi);
+      
         if (sumbu1 == "0" || sumbu1 == "") {
           $("#bsb1").val(0);
           $("#bsel1").val(0);
@@ -246,7 +228,6 @@ function reloadDataRem(urlAct) {
           $("#bsb4kr").val(kiri4);
           $("#bsb4kn").val(kanan4);
         }
-      }
     },
   });
 }
@@ -280,11 +261,11 @@ function prosesRem(urlAct) {
     } else {
       kode[4] = "";
     }
-    if ($("#g34").is(":checked")) {
-      kode[5] = "G34";
-    } else {
-      kode[5] = "";
-    }
+    // if ($("#g34").is(":checked")) {
+    //   kode[5] = "G34";
+    // } else {
+    //   kode[5] = "";
+    // }
     //---------------------------------------------------
     kirim =
       $("#bsb1").val() +
@@ -301,7 +282,35 @@ function prosesRem(urlAct) {
       "," +
       $("#bsel3").val() +
       "," +
-      $("#bsel4").val();
+      $("#bsel4").val() +
+      "," +
+      $("#bsb1kr").val() +
+      "," +
+      $("#bsb1kn").val() +
+      "," +
+      $("#bsb2kr").val() +
+      "," +
+      $("#bsb2kn").val() +
+      "," +
+      $("#bsb3kr").val() +
+      "," +
+      $("#bsb3kn").val() +
+      "," +
+      $("#bsb4kr").val() +
+      "," +
+      $("#bsb4kn").val() +
+      "," +
+      $("#tangan_kanan").val() +
+      "," +
+      $("#tangan_kiri").val() +
+      "," +
+      $("#form_efisiensi_tangan").val() +
+      "," +
+      $("#kaki_kanan").val() +
+      "," +
+      $("#kaki_kiri").val()
+      "," +
+      $("#form_efisiensi_kaki").val();
     kirim = kirim + "," + kode;
     $.messager.defaults.ok = "Ya";
     $.messager.defaults.cancel = "Tidak";
@@ -327,6 +336,15 @@ function prosesRem(urlAct) {
               $("#no_uji_rem").val("");
               $("#tahun_rem").val("");
               $("#no_antrian_rem").val("");
+
+              $("#tangan_kanan").val("");
+              $("#tangan_kiri").val("");
+              $("#form_efisiensi_tangan").val("");
+              $("#efisiensi_tangan").text("0");
+              $("#kaki_kanan").val("");
+              $("#kaki_kiri").val("");
+              $("#form_efisiensi_kaki").val("");
+              $("#efisiensi_kaki").text("0");
 
               $("#bsb1kr").val("");
               $("#bsb2kr").val("");
@@ -381,11 +399,9 @@ function prosesRem(urlAct) {
               $("#um22").iCheck("uncheck");
               $("#um23").iCheck("uncheck");
               $("#um24").iCheck("uncheck");
-              $("#um33").iCheck("uncheck");
-              $("#g34").iCheck("uncheck");
 
               prosesSearchRem();
-              prosesSearchLampu();
+              prosesSearchPitlift();
             },
             error: function () {
               return false;

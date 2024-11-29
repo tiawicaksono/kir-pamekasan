@@ -192,7 +192,7 @@
         <tr>
             <td>Jenis Kendaraan</td>
             <td> : </td>
-            <td><?php echo $dataKendaraan->jenis; ?></td>
+            <td><?php echo $dataKendaraan->karoseri_jenis; ?></td>
         </tr>
         <tr>
             <td>Nomor Rangka</td>

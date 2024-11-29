@@ -87,7 +87,7 @@
                 $penguji = Penguji::model()->findAll();
                 foreach ($penguji as $dataPenguji) :
                 ?>
-                    <option value="<?php echo $dataPenguji->nrp; ?>"><?php echo $dataPenguji->nama; ?></option>
+                    <option value="<?php echo $dataPenguji->idx; ?>"><?php echo $dataPenguji->nama; ?></option>
                 <?php endforeach; ?>
             </select>
         </div>
@@ -126,7 +126,7 @@
                 $penguji = Penguji::model()->findAll();
                 foreach ($penguji as $dataPenguji) :
                 ?>
-                    <option value="<?php echo $dataPenguji->nrp; ?>">
+                    <option value="<?php echo $dataPenguji->idx; ?>">
                         <?php echo $dataPenguji->nama; ?>
                     </option>
                 <?php endforeach; ?>
@@ -238,17 +238,17 @@
                     align: 'center'
                 },
                 {
-                    field: 'rem',
+                    field: 'lampu',
                     width: 50,
-                    title: 'Brake',
+                    title: 'Lampu',
                     sortable: false,
                     halign: 'center',
                     align: 'center'
                 },
                 {
-                    field: 'lampu',
+                    field: 'rem',
                     width: 50,
-                    title: 'Lampu',
+                    title: 'Brake',
                     sortable: false,
                     halign: 'center',
                     align: 'center'

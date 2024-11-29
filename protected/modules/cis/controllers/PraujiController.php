@@ -14,7 +14,6 @@ class PraujiController extends Controller
 
     public function actionListGrid()
     {
-        $kategori = $_POST['textCategory'];
         $search = $_POST['textSearch'];
         $page = isset($_POST['page']) ? intval($_POST['page']) : 1;
         $rows = isset($_POST['rows']) ? intval($_POST['rows']) : 5;
@@ -25,11 +24,6 @@ class PraujiController extends Controller
         $criteria->offset = $offset;
         if (!empty($search)) {
             $criteria->addCondition("(replace(LOWER(no_uji),' ','') like replace(LOWER('%" . $search . "%'),' ','') OR replace(LOWER(no_kendaraan),' ','') like replace(LOWER('%" . $search . "%'),' ',''))");
-        }
-        if ($kategori == 'gandengan') {
-            $criteria->addCondition("(id_jns_kend=4 or id_jns_kend=5)");
-        } else {
-            $criteria->addCondition("(id_jns_kend<>4 and id_jns_kend<>5)");
         }
         $result = VPraUji::model()->findAll($criteria);
         $dataJson = array();
@@ -299,13 +293,13 @@ class PraujiController extends Controller
             $img_kiri = '';
         }
 
-        $proses = "UPDATE tbl_hasil_uji set img_depan='" . $img_depan . "',img_belakang='" . $img_belakang . "',img_kiri='" . $img_kiri . "',img_kanan='" . $img_kanan . "' where id_hasil_uji=" . $idhasil;
+        $proses = "UPDATE tbl_hasil_uji set img_depan='" . $img_depan . "',img_belakang='" . $img_belakang . "',img_kiri='" . $img_kanan . "',img_kanan='" . $img_kanan . "' where id_hasil_uji=" . $idhasil;
         Yii::app()->db->createCommand($proses)->execute();
 
         $data['img_depan'] = $img_depan;
         $data['img_belakang'] = $img_belakang;
         $data['img_kanan'] = $img_kanan;
-        $data['img_kiri'] = $img_kiri;
+        $data['img_kiri'] = $img_kanan;
         echo json_encode($data);
     }
 }

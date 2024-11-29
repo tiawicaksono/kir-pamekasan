@@ -106,7 +106,7 @@ function prosesLampu(urlAct) {
                         $('#devkiri').val('');
                         $("#muncul_tl").text('');
                         prosesSearchLampu();
-                        prosesSearchPitlift();
+                        prosesSearchRem();
                     },
                     error: function () {
                         return false;

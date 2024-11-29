@@ -22,7 +22,7 @@ function getInformationEmisi() {
   var no_uji = row.no_uji;
   var id_hasil_uji = row.id_hasil_uji;
   var tahun = row.tahun;
-  var bahan_bakar = row.bahan_bakar;
+  var bahan_bakar = row.bahan_bakar.toUpperCase();
   var no_antrian = row.no_antrian;
   var id_kendaraan = row.id_kendaraan;
   // captureCamera(id_hasil_uji, id_kendaraan);
@@ -60,7 +60,7 @@ function getInformationEmisi() {
 
 function reloadDataEmisi(urlAct) {
   var tahun_kendaraan = $("#tahun_emisi").val();
-  var bahan_bakar = $("#bahan_bakar_emisi").val();
+  var bahan_bakar = $("#bahan_bakar_emisi").val().toUpperCase();
   $.ajax({
     type: "POST",
     url: urlAct,
@@ -140,7 +140,7 @@ function prosesEmisi(urlAct) {
               $("#img_kiri_emisi").attr("src", "");
 
               prosesSearchEmisi();
-              prosesSearchRem();
+              prosesSearchLampu();
             },
             error: function () {
               return false;

@@ -729,10 +729,16 @@ class VerifikasiController extends Controller
         $data = VDetailTl::model()->findAllByAttributes(array('id_hasil_uji' => $id_hasil_uji));
         $ul = "<ul>";
         foreach ($data as $p) {
-            $ul .= "<li>" . $p->kelulusan . "</li>";
+            $ul .= "<li>" . $p->kelulusan . " <span onclick='deleteKeteranganTl(".$p->id_list_lulus.")'>delete</span></li>";
         }
         $ul .= "</ul>";
         return $ul;
+    }
+
+    public function actionDeleteKeteranganTl() {
+        $id_keterangan_tl=$_POST['idListLulus'];
+        $sql="DELETE FROM tbl_list_kelulusan WHERE id_list_lulus=$id_keterangan_tl";
+        Yii::app()->db->createCommand($sql)->execute();
     }
 
     public function actionSaveCetakl()

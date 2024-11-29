@@ -20,6 +20,7 @@ class RemController extends Controller
     public function actionReloadData()
     {
         $tahun_kendaraan = intval($_POST['tahun_kendaraan']);
+        $jbb = intval($_POST['jbb']);
         $tahun_sekarang = intval(date('Y'));
 
         if (($tahun_sekarang - $tahun_kendaraan) <= 5) {
@@ -57,6 +58,9 @@ class RemController extends Controller
             $selsumbu3 = rand(3, 4);
             $selsumbu4 = rand(3, 4);
         }
+        $nilai_rem_parkir = ((20/100)*$jbb)/2;
+        $parkir_kiri = round($nilai_rem_parkir);
+        $parkir_kanan = round($nilai_rem_parkir);
         $data['bsb1'] = $sumbu1;
         $data['bsb2'] = $sumbu2;
         $data['bsb3'] = $sumbu3;
@@ -73,6 +77,8 @@ class RemController extends Controller
         $data['kanan2'] = $kanan2;
         $data['kanan3'] = $kanan3;
         $data['kanan4'] = $kanan4;
+        $data['parkir_kiri'] = $parkir_kiri;
+        $data['parkir_kanan'] = $parkir_kanan;
 
         echo json_encode($data);
     }
@@ -92,11 +98,7 @@ class RemController extends Controller
         $criteria = new CDbCriteria();
         $criteria->limit = $rows;
         $criteria->offset = $offset;
-        if ($kategori == 'gandengan') {
-            $result = VBreak1::model()->findAll($criteria);
-        } else {
-            $result = VBreak::model()->findAll($criteria);
-        }
+        $result = VBreak::model()->findAll($criteria);
 
         $dataJson = array();
 
@@ -116,6 +118,7 @@ class RemController extends Controller
                 "bsumbu2" => $p->bsumbu2,
                 "bsumbu3" => $p->bsumbu3,
                 "bsumbu4" => $p->bsumbu4,
+                "jbb" => $p->kemjbb,
                 "id_jns_kend" => $p->id_jns_kend,
                 "nm_uji" => $p->nm_uji,
             );

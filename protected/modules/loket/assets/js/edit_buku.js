@@ -176,35 +176,46 @@ function prosesSearch(urlAct) {
           $("#nomer_chasis").val(data.nomer_chasis);
           $("#jenis_kendaraan").val(data.jenis_kendaraan);
           $("#status_kendaraan").val(data.status_kendaraan);
+
           $("#merk").val(data.merk);
           $("#merk").selectpicker("refresh");
-          $("#tipe").val(data.tipe);
+          $("#merk_tipe_lama").text("Data lama : " + data.tipe);
+          setSelectBrandType(data.vehicle_varian_type_id);
+
           $("#pengimport").val(data.pengimport);
           $("#isi_silinder").val(data.isi_silinder);
           $("#daya_motor").val(data.daya_motor);
           $("#bahan_bakar").val(data.bahan_bakar);
+          $("#bahan_bakar").selectpicker("refresh");
           $("#panjang_utama").val(data.ukuran_panjang);
           $("#lebar_utama").val(data.ukuran_lebar);
           $("#tinggi_utama").val(data.ukuran_tinggi);
           $("#panjang_muatan").val(data.dimpanjang);
           $("#lebar_muatan").val(data.dimlebar);
           $("#tinggi_muatan").val(data.dimtinggi);
-          $("#nama_komersil").val(data.nm_komersil);
-          $("#nama_komersil").selectpicker("refresh");
           $("#warna_cabin").val(data.warna_cabin);
           $("#warna_bak").val(data.warna_bak);
           $("#kebelakang").val(data.bagian_belakang);
           $("#kedepan").val(data.bagian_depan);
           $("#jarak_terendah").val(data.bagian_jterendah);
+          
           $("#karoseri_jenis").val(data.karoseri_jenis);
           $("#karoseri_jenis").selectpicker("refresh");
+          $("#karoseri_jenis_lama").text(
+            "Data lama : " + data.karoseri_jenis_lama
+          );
+          $("#nama_komersil_lama").text("Data lama : " + data.nm_komersil_lama);
+          setSelectVehicleType(data.nm_komersil);
+
           $("#karoseri_bahan").val(data.karoseri_bahan);
           $("#karoseri_bahan").selectpicker("refresh");
           $("#tempat_duduk").val(data.karoseri_duduk);
           $("#berdiri").val(data.karoseri_berdiri);
           $("#peng_khusus").val(data.guna_khusus);
+
           $("#konfigurasi_sumbu").val(data.konsumbu);
-          //                    $('#konfigurasi_sumbu').selectpicker('refresh');
+          $("#konfigurasi_sumbu").selectpicker("refresh");
+          
           $("#jarak_sumbu_1").val(data.jsumbu1);
           $("#jarak_sumbu_2").val(data.jsumbu2);
           $("#jarak_sumbu_3").val(data.jsumbu3);
@@ -228,8 +239,10 @@ function prosesSearch(urlAct) {
           $("#jbkb").val(data.kemjbkb);
           $("#daya_angkut_orang").val(data.kemorang);
           $("#daya_angkut_barang").val(data.kembarang);
+          
           $("#kelas_jalan").val(data.kelas_jalan);
           $("#kelas_jalan").selectpicker("refresh");
+          
           $("#q_r").val(data.ukq);
           $("#p1").val(data.ukp);
           $("#p2").val(data.ukp2);
@@ -478,7 +491,12 @@ function submitForm(urlAct) {
     },
     success: function (data) {
       hidelargeloader();
-      //            $.messager.alert('Info', 'process is successful ', 'info');
+      $("#FORMINPUT")[0].reset();
+      $("#text_category").val("");
+      $("#id_kendaraan").val(0);
+      $("#karoseri_jenis_lama").text("Data lama : -");
+      $("#nama_komersil_lama").text("Data lama : -");
+      $("#merk_tipe_lama").text("Data lama : -");
     },
     error: function () {
       hidelargeloader();
@@ -620,6 +638,56 @@ function selectKecamatan() {
     data: { kecamatan: kecamatan },
     success: function (msg) {
       $("#kelurahan_select").html(msg).selectpicker("refresh");
+    },
+  });
+}
+
+function selectVehicleType() {
+  var id = $("#karoseri_jenis :selected").val();
+  $.ajax({
+    url: "Editbuku/SelectVehicleType",
+    type: "POST",
+    data: { id: id },
+    success: function (msg) {
+      $("#nama_komersil").html(msg).selectpicker("refresh");
+    },
+  });
+}
+
+function selectBrandType() {
+  var id = $("#merk :selected").val();
+  $.ajax({
+    url: "Editbuku/SelectBrandType",
+    type: "POST",
+    data: { id: id },
+    success: function (msg) {
+      $("#tipe").html(msg).selectpicker("refresh");
+    },
+  });
+}
+
+function setSelectBrandType(tipe) {
+  var id = $("#merk :selected").val();
+  $.ajax({
+    url: "Editbuku/SelectBrandType",
+    type: "POST",
+    data: { id: id },
+    success: function (msg) {
+      $("#tipe").html(msg).selectpicker("refresh");
+      $("#tipe").val(tipe).selectpicker("refresh");
+    },
+  });
+}
+
+function setSelectVehicleType(nm_komersil) {
+  var id = $("#karoseri_jenis :selected").val();
+  $.ajax({
+    url: "Editbuku/SelectVehicleType",
+    type: "POST",
+    data: { id: id },
+    success: function (msg) {
+      $("#nama_komersil").html(msg).selectpicker("refresh");
+      $("#nama_komersil").val(nm_komersil).selectpicker("refresh");
     },
   });
 }

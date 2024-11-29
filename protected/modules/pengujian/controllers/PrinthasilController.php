@@ -164,11 +164,11 @@ class PrinthasilController extends Controller
     {
         $this->layout = '//';
         Yii::app()->session->add('ses_no_surat', $nosurat);
-        //        Yii::app()->session->add('ses_nrp', $nrp);
-        //PENGUJI
-        $tblPenguji = TblNamaPenguji::model()->findByAttributes(array('nrp' => $nrp));
-        $nm_penguji = $tblPenguji['nama_penguji'];
-        $jabatan = $tblPenguji['jabatan'];
+        $id_petugasuji = $nrp;
+        $tblPenguji = Penguji::model()->findByAttributes(array('idx' => $id_petugasuji));
+        $nrp = $tblPenguji->nrp;
+        $nm_penguji = $tblPenguji->nama;
+        $jabatan = $tblPenguji->pangkat;
         $jam_selesai = date('m/d/Y g:i:s');
 
         $tblHasilUji = TblHasilUji::model()->findByAttributes(array('id_hasil_uji' => $id));
@@ -191,16 +191,14 @@ class PrinthasilController extends Controller
     {
         $no_seri_kartu = $_POST['no_seri_kartu'];
         $id = $_POST['id'];
-        $posisi = $_POST['posisi'];
-        $nrp = $_POST['penguji'];
+        $id_petugasuji = $_POST['penguji'];
         $username = Yii::app()->session['username'];
-        $selectIdDaftar = TblHasilUji::model()->findByAttributes(array('id_hasil_uji' => $id))->id_daftar;
-        $countTblProses = TblProses::model()->findByAttributes(array('id_daftar' => $selectIdDaftar));
+        $dtHasilUji = VPrintHasil::model()->findByAttributes(array('id_hasil_uji' => $id));
+        $countTblProses = TblProses::model()->findByAttributes(array('id_daftar' => $dtHasilUji->id_daftar));
         if (!empty($countTblProses)) {
-            $sqlPtgPrint = "update tbl_proses set ptgs_print_hasil='$username' where id_daftar=$selectIdDaftar";
+            $sqlPtgPrint = "update tbl_proses set ptgs_print_hasil='$username' where id_daftar=$dtHasilUji->id_daftar";
             Yii::app()->db->createCommand($sqlPtgPrint)->execute();
         }
-        $dtHasilUji = VPrintHasil::model()->findByAttributes(array('id_hasil_uji' => $id));
         if (!empty($no_seri_kartu)) {
 
             $id_retribusi = $dtHasilUji->id_retribusi;
@@ -218,31 +216,42 @@ class PrinthasilController extends Controller
                 Yii::app()->db->createCommand($insertTblBuku)->execute();
             }
         }
-        //PENGUJI
-        $tblPenguji = Penguji::model()->findByAttributes(array('nrp' => $nrp));
-        $nm_penguji = $tblPenguji['nama'];
-        $jabatan = $tblPenguji['pangkat'];
-        $jam_selesai = date('m/d/Y g:i:s');
+        // $tblPenguji = MasterEmployee::model()->findByPk($id_petugasuji);
+        // $nrp = $tblPenguji->identity_number;
+        // $nm_penguji = $tblPenguji->full_name;
+        // $jabatan = $tblPenguji->pangkat;
+        // $id_direktur = MasterEmployee::model()->findByAttributes(array('job_name' => 'Direktur'))->user_id;
+        // $id_kepaladinas = MasterEmployee::model()->findByAttributes(array('job_name' => 'Kepala Dinas'))->user_id;
+        $id_petugasuji_new = 958;
+        $id_direktur_new = 867;
+        $id_kepaladinas_new = 917;
+        $tblPenguji = Penguji::model()->findByAttributes(array('idx' => $id_petugasuji));
+        $nrp = $tblPenguji->nrp;
+        $nm_penguji = $tblPenguji->nama;
+        $jabatan = $tblPenguji->pangkat;
+        $id_direktur = Direktur::model()->find()->idx;
+        $id_kepaladinas = Kepaladinas::model()->find()->idx;
+        $jam_selesai = date('m/d/Y g:i:s A');
 
         $tblHasilUji = TblHasilUji::model()->findByAttributes(array('id_hasil_uji' => $id));
         $sql = "UPDATE tbl_hasil_uji SET nm_penguji='$nm_penguji', jabatan = '$jabatan', jselesai = '$jam_selesai', cetak = 'true', nrp = '$nrp'  WHERE id_hasil_uji = $id";
         Yii::app()->db->createCommand($sql)->query();
         $today = date('Y-m-d');
-        //            ==============
-        //            CARA 1
-        //            ==============
+        //    ==============
+        //    CARA 1
+        //    ==============
         $tgl_mati_uji = date('n/j/Y', strtotime('+6 month', strtotime($today)));
-        //            ==============
-        //            CARA 2
-        //            ==============
-        //            $tambah_tanggal = mktime(0,0,0,date('m')+6);
-        //            $tgl_mati_uji = date('n/j/Y',$tambah_tanggal);
-        //            ==============
-        //            CARA 3
-        //            ==============
-        //            $date = date_create($today);
-        //            date_add($date, date_interval_create_from_date_string('6 months'));
-        //            $tgl_mati_uji = date_format($date, 'n/j/Y');
+        //    ==============
+        //    CARA 2
+        //    ==============
+        //    $tambah_tanggal = mktime(0,0,0,date('m')+6);
+        //    $tgl_mati_uji = date('n/j/Y',$tambah_tanggal);
+        //    ==============
+        //    CARA 3
+        //    ==============
+        //    $date = date_create($today);
+        //    date_add($date, date_interval_create_from_date_string('6 months'));
+        //    $tgl_mati_uji = date_format($date, 'n/j/Y');
         $sql_mati_uji = "UPDATE tbl_kendaraan SET tgl_mati_uji = '$tgl_mati_uji' where id_kendaraan = $tblHasilUji->id_kendaraan";
         Yii::app()->db->createCommand($sql_mati_uji)->query();
         $sql_daftar = "UPDATE tbl_daftar SET lulus = 'true' where id_daftar = $tblHasilUji->id_daftar";
@@ -263,7 +272,6 @@ class PrinthasilController extends Controller
             $modelRiwayat->id_hasil_uji = $id;
             $modelRiwayat->id_kendaraan = $tblHasilUji->id_kendaraan;
             $modelRiwayat->nrp = $nrp;
-            $modelRiwayat->stts_kirim = 0;
             $modelRiwayat->save();
         }
 
@@ -280,18 +288,36 @@ class PrinthasilController extends Controller
         //INSERT TABEL DATAPENGUJIAN - KEMENTRIAN
         $dtRetribusi = TblRetribusi::model()->findByAttributes(array('id_retribusi' => $dtHasilUji->id_retribusi));
         $jenis_uji = $dtRetribusi->id_uji;
-        $id_direktur = Direktur::model()->find()->idx;
-        $id_kepaladinas = Kepaladinas::model()->find()->idx;
-        $id_petugasuji = Penguji::model()->findByAttributes(array('nrp' => $nrp))->idx;
+
         /*
          * 1. DAFTAR BARU
          * 2. PERPANJANGAN
          * 3. PENGGANTIAN KARENA RUSAK
          * 4. PENGGANTIAN KARENA HILANG
-         * 5. NUMPANG UJI MASUK
-         * 6. MUTASI MASUK
+         * 5. NUMPANG UJI KELUAR
+         * 6. MUTASI KELUAR
+         * 7. NUMPANG UJI MASUK
+         * 8. MUTASI MASUK
+         * 9. UBAH BENTUK
          */
         $kode_wilayah_asal = 'PMKSN';
+        // if ($jenis_uji == 1 || $jenis_uji == 21 || $jenis_uji == 6) {
+        //     // BERKALA
+        //     $statuspenerbitan = 2;
+        // } elseif ($jenis_uji == 8) {
+        //     // UJI PERTAMA
+        //     $statuspenerbitan = 1;
+        // } elseif ($jenis_uji == 2) {
+        //     // numpang masuk
+        //     $statuspenerbitan = 7;
+        //     $kode_wilayah_asal = $dtRetribusi->wilayah_asal_kode;
+        // } elseif ($jenis_uji == 4) {
+        //     // mutasi masuk
+        //     $statuspenerbitan = 8;
+        //     $kode_wilayah_asal = $dtRetribusi->wilayah_asal_kode;
+        // } else {
+        //     $statuspenerbitan = 2;
+        // }
         if ($jenis_uji == 8) {
             $statuspenerbitan = 1;
         } elseif ($jenis_uji == 1 || $jenis_uji == 22 || $jenis_uji == 23) {
@@ -303,13 +329,13 @@ class PrinthasilController extends Controller
             $statuspenerbitan = 6;
             $kode_wilayah_asal = $dtRetribusi->wilayah_asal_kode;
         }
+        $data_area = MasterArea::model()->findByAttributes(array('area_code' => $kode_wilayah_asal));
+        $area_from_id = $data_area->area_id;
+        $area_from_name = $data_area->area_name;
         /*
          * JBKI
          */
-        $jbki = '-';
-        //        if($dtHasilUji->id_jns_kend == 5){
-        //            $jbki = '-';
-        //        }
+        $jbki = '0';
         $tglUji = date('dmY', strtotime($dtHasilUji->jdatang));
         $arrDtPengujian = new CDbCriteria();
         $arrDtPengujian->addCondition("tgluji = '$tglUji'");
@@ -325,6 +351,7 @@ class PrinthasilController extends Controller
         }
         $alamat = ucwords(strtolower($dtHasilUji->alamat));
         $nosertifikatreg = $dtHasilUji->no_regis;
+        $tglsertifikatreg_new = date('m/d/Y', strtotime($dtHasilUji->tgl_regis));
         $tglsertifikatreg = date('dmY', strtotime($dtHasilUji->tgl_regis));
         $noregistrasikendaraan = $dtHasilUji->no_kendaraan;
         $norangka = $dtHasilUji->no_chasis;
@@ -332,6 +359,9 @@ class PrinthasilController extends Controller
         $merek = $dtHasilUji->merk;
         $tipe = $dtHasilUji->tipe;
         $jenis = $dtHasilUji->karoseri_jenis;
+        $sub_jenis = $dtHasilUji->nm_komersil;
+        $varian = $dtHasilUji->tipe;
+        $sub_varian = MasterMerkTipeSub::model()->findByPk($dtHasilUji->vehicle_varian_id)->vehicle_varian_name;
         $thpembuatan = $dtHasilUji->tahun;
         $bahanbakar = $dtHasilUji->bahan_bakar;
         $isisilinder = $dtHasilUji->isi_silinder;
@@ -343,6 +373,28 @@ class PrinthasilController extends Controller
         $mst = $dtHasilUji->mst;
         $beratkosong = $dtHasilUji->berat_kosong;
         $konfigurasisumburoda = $dtHasilUji->konsumbu;
+        $bsumbu1 = $dtHasilUji->bsumbu1;
+        $bsumbu2 = $dtHasilUji->bsumbu2;
+        $bsumbu3 = $dtHasilUji->bsumbu3;
+        $bsumbu4 = $dtHasilUji->bsumbu4;
+        $bsumbu5 = $dtHasilUji->bsumbu5;
+        if ($konfigurasisumburoda == '1.1' || $konfigurasisumburoda == '2.2' || $konfigurasisumburoda == '1.2') {
+            $jumlahsumbu = 2;
+        } elseif ($konfigurasisumburoda == '1.1.1' || $konfigurasisumburoda == '2.2.2' || $konfigurasisumburoda == '1.1.2' || $konfigurasisumburoda == '1.2.2') {
+            $jumlahsumbu = 3;
+        } else {
+            $jumlahsumbu = 4;
+        }
+        $alatuji_gayapengereman1kanan = $dtHasilUji->gaya_rem_kanan1;
+        $alatuji_gayapengereman2kanan = $dtHasilUji->gaya_rem_kanan2;
+        $alatuji_gayapengereman3kanan = $dtHasilUji->gaya_rem_kanan3;
+        $alatuji_gayapengereman4kanan = $dtHasilUji->gaya_rem_kanan4;
+        $alatuji_gayapengereman1kiri = $dtHasilUji->gaya_rem_kiri1;
+        $alatuji_gayapengereman2kiri = $dtHasilUji->gaya_rem_kiri2;
+        $alatuji_gayapengereman3kiri = $dtHasilUji->gaya_rem_kiri3;
+        $alatuji_gayapengereman4kiri = $dtHasilUji->gaya_rem_kiri4;
+        $total_gaya_pengereman_kanan = $alatuji_gayapengereman1kanan + $alatuji_gayapengereman2kanan + $alatuji_gayapengereman3kanan + $alatuji_gayapengereman4kanan;
+        $total_gaya_pengereman_kiri = $alatuji_gayapengereman1kiri + $alatuji_gayapengereman2kiri + $alatuji_gayapengereman3kiri + $alatuji_gayapengereman4kiri;
         $ukuranban = $dtHasilUji->psumbu1;
         $panjangkendaraan = $dtHasilUji->ukuran_panjang;
         $lebarkendaraan = $dtHasilUji->ukuran_lebar;
@@ -355,14 +407,20 @@ class PrinthasilController extends Controller
         $jaraksumbu1_2 = $dtHasilUji->jsumbu1;
         $jaraksumbu2_3 = $dtHasilUji->jsumbu2;
         $jaraksumbu3_4 = $dtHasilUji->jsumbu3;
+        $wheel_base = $jaraksumbu1_2 + $jaraksumbu2_3 + $jaraksumbu3_4;
         $dayaangkutorang = $dtHasilUji->karoseri_duduk;
         $dayaangkutbarang = $dtHasilUji->kembarang;
         $kelasjalanterendah = $dtHasilUji->kls_jln;
-        $idpetugasuji = $id_petugasuji;
-        $idkepaladinas = $id_kepaladinas;
-        $iddirektur = $id_direktur;
         $kodewilayah = 'PMKSN';
         $kodewilayahasal = $kode_wilayah_asal;
+        $kelasjalanterendah = $dtHasilUji->kls_jln;
+        $kelasjalan_id = $dtHasilUji->kelasjalan_id;
+        $fuel_id = $dtHasilUji->fuel_id;
+        $vehicle_varian_id = $dtHasilUji->vehicle_varian_id;
+        $vehicle_varian_type_id = $dtHasilUji->vehicle_varian_type_id;
+        $vehicle_brand_id = $dtHasilUji->vehicle_brand_id;
+        $vehicle_type_id = $dtHasilUji->vehicle_type_id;
+        $vehicle_type_sub_id = $dtHasilUji->vehicle_type_sub_id;
         $huv_nomordankondisirangka = 1;
         $huv_nomordantipemotorpenggerak = 1;
         $huv_kondisitangkicorongdanpipabahanbakar = 1;
@@ -393,20 +451,18 @@ class PrinthasilController extends Controller
         $alatuji_emisiasapbahanbakarsolar = $dtHasilUji->ems_diesel;
         $alatuji_emisicobahanbakarbensin = $dtHasilUji->ems_mesin_co;
         $alatuji_emisihcbahanbakarbensin = $dtHasilUji->ems_mesin_hc;
-        $alatuji_remutamatotalgayapengereman = $dtHasilUji->beratgaya;
-        $alatuji_remutamaselisihgayapengeremanrodakirikanan1 = $dtHasilUji->selgaya;
-        $alatuji_remutamaselisihgayapengeremanrodakirikanan2 = $dtHasilUji->selkirikanan;
-        $alatuji_remutamaselisihgayapengeremanrodakirikanan3 = $dtHasilUji->selgaya3;
-        $alatuji_remutamaselisihgayapengeremanrodakirikanan4 = $dtHasilUji->selgaya4;
-        //M.PENUMPANG
-        if ($dtHasilUji->id_jns_kend == 1) {
-            $alatuji_remparkirkaki = rand(16, 100);
-            $alatuji_remparkirtangan = rand(16, 100);
-            //M.BARANG, DLL	
-        } else {
-            $alatuji_remparkirkaki = rand(12, 100);
-            $alatuji_remparkirtangan = rand(12, 100);
-        }
+        $alatuji_remutamatotalgayapengereman = $total_gaya_pengereman_kanan + $total_gaya_pengereman_kiri;
+        $alatuji_remutamaselisihgayapengeremanrodakirikanan1 = $dtHasilUji->selrem_sb1;
+        $alatuji_remutamaselisihgayapengeremanrodakirikanan2 = $dtHasilUji->selrem_sb2;
+        $alatuji_remutamaselisihgayapengeremanrodakirikanan3 = $dtHasilUji->selrem_sb3;
+        $alatuji_remutamaselisihgayapengeremanrodakirikanan4 = $dtHasilUji->selrem_sb4;
+        $alatuji_remparkirkaki = $dtHasilUji->gaya_rem_parkir_kaki;
+        $alatuji_remparkirtangan =  $dtHasilUji->gaya_rem_parkir_tangan;
+        $efisiensi_remparkir_tangan =  round($alatuji_remparkirtangan*100/$jbb);
+        $efisiensi_remparkir_kaki =  round($alatuji_remparkirtangan*100/$jbb);
+        $alatuji_remparkirtotalgayapengereman = ($alatuji_remparkirkaki + $alatuji_remparkirtangan);
+        $alatuji_gayapengeremanparkirkanan = $dtHasilUji->gaya_rem_parkir_kanan;
+        $alatuji_gayapengeremanparkirkiri = $dtHasilUji->gaya_rem_parkir_kiri;
         $alatuji_kincuprodadepan = rand(1, 5);
         $alatuji_tingkatkebisingan = rand(83, 118);
         $alatuji_lampuutamakekuatanpancarlampukanan = $dtHasilUji->ktlamp_kanan;
@@ -415,12 +471,523 @@ class PrinthasilController extends Controller
         $alatuji_lampuutamapenyimpanganlampukiri = number_format($dtHasilUji->dev_kiri, 2, '.', '.');
         $alatuji_penunjukkecepatan = 40;
         $alatuji_kedalamanalurban = rand(1, 15);
+        $alatuji_alatpemantulcahayatambahan_kuning =
+            rand(75, 130);
+        $alatuji_alatpemantulcahayatambahan_putih =
+            rand(95, 200);
+        $alatuji_alatpemantulcahayatambahan_merah =
+            rand(30, 60);
         $masaberlakuuji = date('dmY', strtotime($dtHasilUji->tgl_mati_uji));
         $tgluji = date('dmY', strtotime($dtHasilUji->tgl_uji));
         $statuslulusuji = TRUE;
 
+
+        $sql = "INSERT INTO datapengujian (
+                statuspenerbitan,
+                nouji,
+                nama,
+                alamat,
+                noidentitaspemilik,
+                nosertifikatreg,
+                tglsertifikatreg,
+                nosuratkehilangan,
+                noregistrasikendaraan,
+                tgl_registrasikendaraan,
+                norangka,
+                nomesin,
+                merek,
+                tipe,
+                jenis,
+                subjenis_kendaraan,
+                varian_kendaraan,
+                sub_varian_kendaraan,
+                thpembuatan,
+                bahanbakar,
+                isisilinder,
+                dayamotorpenggerak,
+                jbb,
+                jbkb,
+                jbi,
+                jbki,
+                mst,
+                beratkosong,
+                konfigurasisumburoda,
+                ukuranban,
+                panjangkendaraan,
+                lebarkendaraan,
+                tinggikendaraan,
+                panjangbakatautangki,
+                lebarbakatautangki,
+                tinggibakatautangki,
+                jumlah_sumbu,
+                julurdepan,
+                julurbelakang,
+                wheel_base,
+                jaraksumbu1_2,
+                jaraksumbu2_3,
+                jaraksumbu3_4,
+                jaraksumbu4_5,
+                jaraksumbu5_6,
+                jaraksumbu6_7,
+                jaraksumbu7_8,
+                jaraksumbu8_9,
+                jaraksumbu9_10,
+                jaraksumbu10_11,
+                jaraksumbu11_12,
+                dayaangkutorang,
+                dayaangkutbarang,
+                kelasjalanterendah,
+                masaberlakuuji,
+                tgluji,
+                statuslulusuji,
+                kodewilayah,
+                kodewilayahasal,
+                area_from_id,
+                area_from_name,
+                vehicle_brand_id,
+                vehicle_type_id,
+                vehicle_sub_id,
+                vehicle_varian_type_id,
+                vehicle_varian_id,
+                fuel_id,
+                kelasjalan_id,
+                idpetugasuji,
+                idkepaladinas,
+                iddirektur,
+                fotodepansmall,
+                fotobelakangsmall,
+                fotokanansmall,
+                fotokirismall,
+                huv_nomordankondisirangka,
+                huv_nomordantipemotorpenggerak,
+                huv_kondisitangkicorongdanpipabahanbakar,
+                huv_kondisiconverterkit,
+                huv_kondisidanposisipipapembuangan,
+                huv_ukurandankondisiban,
+                huv_kondisisistemsuspensi,
+                huv_kondisisistemremutama,
+                huv_kondisipenutuplampudanalatpantulcahaya,
+                huv_kondisipanelinstrumentdashboard,
+                huv_kondisikacaspion,
+                huv_kondisispakbor,
+                huv_bentukbumper,
+                huv_keberadaandankondisiperlengkapan,
+                huv_rancanganteknis,
+                huv_keberadaandankondisifasilitastanggapdaruratuntukmobilbus,
+                huv_kondisibadankacaengseltempatdudukmbarangbakmuatantertutup,
+                hum_kondisipenerusdaya,
+                hum_sudutbebaskemudi,
+                hum_kondisiremparkir,
+                hum_fungsilampudanalatpantulcahaya,
+                hum_fungsipenghapuskaca,
+                hum_tingkatkegelapankaca,
+                hum_fungsiklakson,
+                hum_kondisidanfungsisabukkeselamatan,
+                hum_ukurankendaraan,
+                hum_ukurantempatdudukdanbagiandalamkendaraanuntukmobilbus,
+                berat_sumbu1,
+                berat_sumbu2,
+                berat_sumbu3,
+                berat_sumbu4,
+                berat_sumbu5,
+                berat_sumbu6,
+                berat_sumbu7,
+                berat_sumbu8,
+                berat_sumbu9,
+                berat_sumbu10,
+                berat_sumbu11,
+                berat_sumbu12,
+                alatuji_emisiasapbahanbakarsolar,
+                alatuji_emisicobahanbakarbensin,
+                alatuji_emisihcbahanbakarbensin,
+                alatuji_gayaremparkirtangan,
+                alatuji_gayaremparkirkaki,
+                alatuji_gayapengereman1kanan,
+                alatuji_gayapengereman2kanan,
+                alatuji_gayapengereman3kanan,
+                alatuji_gayapengereman4kanan,
+                alatuji_gayapengereman5kanan,
+                alatuji_gayapengereman6kanan,
+                alatuji_gayapengereman7kanan,
+                alatuji_gayapengereman8kanan,
+                alatuji_gayapengereman9kanan,
+                alatuji_gayapengereman10kanan,
+                alatuji_gayapengereman11kanan,
+                alatuji_gayapengereman12kanan,
+                alatuji_gayapengereman1kiri,
+                alatuji_gayapengereman2kiri,
+                alatuji_gayapengereman3kiri,
+                alatuji_gayapengereman4kiri,
+                alatuji_gayapengereman5kiri,
+                alatuji_gayapengereman6kiri,
+                alatuji_gayapengereman7kiri,
+                alatuji_gayapengereman8kiri,
+                alatuji_gayapengereman9kiri,
+                alatuji_gayapengereman10kiri,
+                alatuji_gayapengereman11kiri,
+                alatuji_gayapengereman12kiri,
+                alatuji_gayapengeremanparkirkanan,
+                alatuji_gayapengeremanparkirkiri,
+                alatuji_remutamatotalgayapengereman,
+                alatuji_remparkirtotalgayapengereman,
+                alatuji_kincuprodadepan,
+                alatuji_tingkatkebisingan,
+                alatuji_lampuutamakekuatanpancarlampukanan,
+                alatuji_lampuutamakekuatanpancarlampukiri,
+                alatuji_lampuutamapenyimpanganlampukanan,
+                alatuji_lampuutamapenyimpanganlampukiri,
+                alatuji_penunjukkecepatan,
+                alatuji_kedalamanalurban,
+                alatuji_alatpemantulcahayatambahan_kuning,
+                alatuji_alatpemantulcahayatambahan_putih,
+                alatuji_alatpemantulcahayatambahan_merah
+        ) VALUES (
+                '$statuspenerbitan',
+                '$nouji',
+                '$nama',
+                '$alamat',
+                '$noidentitaspemilik',
+                '$nosertifikatreg',
+                '$tglsertifikatreg_new',
+                '-',
+                '$noregistrasikendaraan',
+                '$tglsertifikatreg_new',
+                '$norangka',
+                '$nomesin',
+                '$merek',
+                '$tipe',
+                '$jenis',
+                '$sub_jenis',
+                '$varian',
+                '$sub_varian',
+                '$thpembuatan',
+                '$bahanbakar',
+                '$isisilinder',
+                '$dayamotorpenggerak',
+                '$jbb',
+                '$jbkb',
+                '$jbi',
+                '$jbki',
+                '$mst',
+                '$beratkosong',
+                '$konfigurasisumburoda',
+                '$ukuranban',
+                '$panjangkendaraan',
+                '$lebarkendaraan',
+                '$tinggikendaraan',
+                '$panjangbakatautangki',
+                '$lebarbakatautangki',
+                '$tinggibakatautangki',
+                '$jumlahsumbu',
+                '$julurdepan',
+                '$julurbelakang',
+                '$wheel_base',
+                '$jaraksumbu1_2',
+                '$jaraksumbu2_3',
+                '$jaraksumbu3_4',
+                '0',
+                '0',
+                '0',
+                '0',
+                '0',
+                '0',
+                '0',
+                '0',
+                '$dayaangkutorang',
+                '$dayaangkutbarang',
+                '$kelasjalanterendah',
+                '$masaberlakuuji',
+                '$tgluji',
+                '$statuslulusuji',
+                '$kodewilayah',
+                '$kodewilayahasal',
+                $area_from_id,
+                '$area_from_name',
+                $vehicle_brand_id,
+                $vehicle_type_id,
+                $vehicle_type_sub_id,
+                $vehicle_varian_type_id,
+                $vehicle_varian_id,
+                $fuel_id,
+                $kelasjalan_id,
+                $id_petugasuji_new,
+                $id_kepaladinas_new,
+                $id_direktur_new,
+                decode('$dtHasilUji->img_depan','base64'),
+                decode('$dtHasilUji->img_belakang','base64'),
+                decode('$dtHasilUji->img_kanan','base64'),
+                decode('$dtHasilUji->img_kiri','base64'),
+                '$huv_nomordankondisirangka',
+                '$huv_nomordantipemotorpenggerak',
+                '$huv_kondisitangkicorongdanpipabahanbakar',
+                '$huv_kondisiconverterkit',
+                '$huv_kondisidanposisipipapembuangan',
+                '$huv_ukurandankondisiban',
+                '$huv_kondisisistemsuspensi',
+                '$huv_kondisisistemremutama',
+                '$huv_kondisipenutuplampudanalatpantulcahaya',
+                '$huv_kondisipanelinstrumentdashboard',
+                '$huv_kondisikacaspion',
+                '$huv_kondisispakbor',
+                '$huv_bentukbumper',
+                '$huv_keberadaandankondisiperlengkapan',
+                '$huv_rancanganteknis',
+                '$huv_keberadaandankondisifasilitastanggapdaruratuntukmobilbus',
+                '$huv_kondisibadankacaengseltempatdudukmbarangbakmuatantertutup',
+                '$hum_kondisipenerusdaya',
+                '$hum_sudutbebaskemudi',
+                '$hum_kondisiremparkir',
+                '$hum_fungsilampudanalatpantulcahaya',
+                '$hum_fungsipenghapuskaca',
+                '$hum_tingkatkegelapankaca',
+                '$hum_fungsiklakson',
+                '$hum_kondisidanfungsisabukkeselamatan',
+                '$hum_ukurankendaraan',
+                '$hum_ukurantempatdudukdanbagiandalamkendaraanuntukmobilbus',
+                '$bsumbu1',
+                '$bsumbu2',
+                '$bsumbu3',
+                '$bsumbu4',
+                '$bsumbu5',
+                '0',
+                '0',
+                '0',
+                '0',
+                '0',
+                '0',
+                '0',
+                '$alatuji_emisiasapbahanbakarsolar',
+                '$alatuji_emisicobahanbakarbensin',
+                '$alatuji_emisihcbahanbakarbensin',
+                '$alatuji_remparkirtangan',
+                '$alatuji_remparkirkaki',
+                '$alatuji_gayapengereman1kanan',
+                '$alatuji_gayapengereman2kanan',
+                '$alatuji_gayapengereman3kanan',
+                '$alatuji_gayapengereman4kanan',
+                '0',
+                '0',
+                '0',
+                '0',
+                '0',
+                '0',
+                '0',
+                '0',
+                '$alatuji_gayapengereman1kiri',
+                '$alatuji_gayapengereman2kiri',
+                '$alatuji_gayapengereman3kiri',
+                '$alatuji_gayapengereman4kiri',
+                '0',
+                '0',
+                '0',
+                '0',
+                '0',
+                '0',
+                '0',
+                '0',
+                '$alatuji_gayapengeremanparkirkanan',
+                '$alatuji_gayapengeremanparkirkiri',
+                '$alatuji_remutamatotalgayapengereman',
+                '$alatuji_remparkirtotalgayapengereman',
+                '$alatuji_kincuprodadepan',
+                '$alatuji_tingkatkebisingan',
+                '$alatuji_lampuutamakekuatanpancarlampukanan',
+                '$alatuji_lampuutamakekuatanpancarlampukiri',
+                '$alatuji_lampuutamapenyimpanganlampukanan',
+                '$alatuji_lampuutamapenyimpanganlampukiri',
+                '$alatuji_penunjukkecepatan',
+                '$alatuji_kedalamanalurban',
+                '$alatuji_alatpemantulcahayatambahan_kuning',
+                '$alatuji_alatpemantulcahayatambahan_putih',
+                '$alatuji_alatpemantulcahayatambahan_merah')";
+        Yii::app()->dbcoba->createCommand($sql)->execute();
+
         if (empty($cekDtPengujian)) {
-            $sql = "INSERT INTO datapengujian (statuspenerbitan,nouji,nama,alamat,noidentitaspemilik,nosertifikatreg,tglsertifikatreg,noregistrasikendaraan,norangka,nomesin,merek,tipe,jenis,thpembuatan,bahanbakar,isisilinder,dayamotorpenggerak,jbb,jbkb,jbi,jbki,mst,beratkosong,konfigurasisumburoda,ukuranban,panjangkendaraan,lebarkendaraan,tinggikendaraan,panjangbakatautangki,lebarbakatautangki,tinggibakatautangki,julurdepan,julurbelakang,jaraksumbu1_2,jaraksumbu2_3,jaraksumbu3_4,dayaangkutorang,dayaangkutbarang,kelasjalanterendah,idpetugasuji,idkepaladinas,iddirektur,kodewilayah,kodewilayahasal,huv_nomordankondisirangka,huv_nomordantipemotorpenggerak,huv_kondisitangkicorongdanpipabahanbakar,huv_kondisiconverterkit,huv_kondisidanposisipipapembuangan,huv_ukurandankondisiban,huv_kondisisistemsuspensi,huv_kondisisistemremutama,huv_kondisipenutuplampudanalatpantulcahaya,huv_kondisipanelinstrumentdashboard,huv_kondisikacaspion,huv_kondisispakbor,huv_bentukbumper,huv_keberadaandankondisiperlengkapan,huv_rancanganteknis,huv_keberadaandankondisifasilitastanggapdaruratuntukmobilbus,huv_kondisibadankacaengseltempatdudukmbarangbakmuatantertutup,hum_kondisipenerusdaya,hum_sudutbebaskemudi,hum_kondisiremparkir,hum_fungsilampudanalatpantulcahaya,hum_fungsipenghapuskaca,hum_tingkatkegelapankaca,hum_fungsiklakson,hum_kondisidanfungsisabukkeselamatan,hum_ukurankendaraan,hum_ukurantempatdudukdanbagiandalamkendaraanuntukmobilbus,alatuji_emisiasapbahanbakarsolar,alatuji_emisicobahanbakarbensin,alatuji_emisihcbahanbakarbensin,alatuji_remutamatotalgayapengereman,alatuji_remutamaselisihgayapengeremanrodakirikanan1,alatuji_remutamaselisihgayapengeremanrodakirikanan2,alatuji_remutamaselisihgayapengeremanrodakirikanan3,alatuji_remutamaselisihgayapengeremanrodakirikanan4,alatuji_remparkirtangan,alatuji_remparkirkaki,alatuji_kincuprodadepan,alatuji_tingkatkebisingan,alatuji_lampuutamakekuatanpancarlampukanan,alatuji_lampuutamakekuatanpancarlampukiri,alatuji_lampuutamapenyimpanganlampukanan,alatuji_lampuutamapenyimpanganlampukiri,alatuji_penunjukkecepatan,alatuji_kedalamanalurban,masaberlakuuji,tgluji,statuslulusuji) VALUES ('$statuspenerbitan','$nouji','$nama','$alamat','$noidentitaspemilik','$nosertifikatreg','$tglsertifikatreg','$noregistrasikendaraan','$norangka','$nomesin','$merek','$tipe','$jenis','$thpembuatan','$bahanbakar','$isisilinder','$dayamotorpenggerak','$jbb','$jbkb','$jbi','$jbki','$mst','$beratkosong','$konfigurasisumburoda','$ukuranban','$panjangkendaraan','$lebarkendaraan','$tinggikendaraan','$panjangbakatautangki','$lebarbakatautangki','$tinggibakatautangki','$julurdepan','$julurbelakang','$jaraksumbu1_2','$jaraksumbu2_3','$jaraksumbu3_4','$dayaangkutorang','$dayaangkutbarang','$kelasjalanterendah',$idpetugasuji,$idkepaladinas,$iddirektur,'$kodewilayah','$kodewilayahasal','$huv_nomordankondisirangka','$huv_nomordantipemotorpenggerak','$huv_kondisitangkicorongdanpipabahanbakar','$huv_kondisiconverterkit','$huv_kondisidanposisipipapembuangan','$huv_ukurandankondisiban','$huv_kondisisistemsuspensi','$huv_kondisisistemremutama','$huv_kondisipenutuplampudanalatpantulcahaya','$huv_kondisipanelinstrumentdashboard','$huv_kondisikacaspion','$huv_kondisispakbor','$huv_bentukbumper','$huv_keberadaandankondisiperlengkapan','$huv_rancanganteknis','$huv_keberadaandankondisifasilitastanggapdaruratuntukmobilbus','$huv_kondisibadankacaengseltempatdudukmbarangbakmuatantertutup','$hum_kondisipenerusdaya','$hum_sudutbebaskemudi','$hum_kondisiremparkir','$hum_fungsilampudanalatpantulcahaya','$hum_fungsipenghapuskaca','$hum_tingkatkegelapankaca','$hum_fungsiklakson','$hum_kondisidanfungsisabukkeselamatan','$hum_ukurankendaraan','$hum_ukurantempatdudukdanbagiandalamkendaraanuntukmobilbus','$alatuji_emisiasapbahanbakarsolar','$alatuji_emisicobahanbakarbensin','$alatuji_emisihcbahanbakarbensin','$alatuji_remutamatotalgayapengereman','$alatuji_remutamaselisihgayapengeremanrodakirikanan1','$alatuji_remutamaselisihgayapengeremanrodakirikanan2','$alatuji_remutamaselisihgayapengeremanrodakirikanan3','$alatuji_remutamaselisihgayapengeremanrodakirikanan4','$alatuji_remparkirtangan','$alatuji_remparkirkaki','$alatuji_kincuprodadepan','$alatuji_tingkatkebisingan','$alatuji_lampuutamakekuatanpancarlampukanan','$alatuji_lampuutamakekuatanpancarlampukiri','$alatuji_lampuutamapenyimpanganlampukanan','$alatuji_lampuutamapenyimpanganlampukiri','$alatuji_penunjukkecepatan','$alatuji_kedalamanalurban','$masaberlakuuji','$tgluji','$statuslulusuji')";
+            $sql = "INSERT INTO datapengujian (
+            statuspenerbitan,
+            nouji,
+            nama,
+            alamat,
+            noidentitaspemilik,
+            nosertifikatreg,
+            tglsertifikatreg,
+            noregistrasikendaraan,
+            norangka,
+            nomesin,
+            merek,
+            tipe,
+            jenis,
+            thpembuatan,
+            bahanbakar,
+            isisilinder,
+            dayamotorpenggerak,
+            jbb,
+            jbkb,
+            jbi,
+            jbki,
+            mst,
+            beratkosong,
+            konfigurasisumburoda,
+            ukuranban,
+            panjangkendaraan,
+            lebarkendaraan,
+            tinggikendaraan,
+            panjangbakatautangki,
+            lebarbakatautangki,
+            tinggibakatautangki,
+            julurdepan,
+            julurbelakang,
+            jaraksumbu1_2,
+            jaraksumbu2_3,
+            jaraksumbu3_4,
+            dayaangkutorang,
+            dayaangkutbarang,
+            kelasjalanterendah,
+            idpetugasuji,
+            idkepaladinas,
+            iddirektur,
+            kodewilayah,
+            kodewilayahasal,
+            huv_nomordankondisirangka,
+            huv_nomordantipemotorpenggerak,
+            huv_kondisitangkicorongdanpipabahanbakar,
+            huv_kondisiconverterkit,
+            huv_kondisidanposisipipapembuangan,
+            huv_ukurandankondisiban,
+            huv_kondisisistemsuspensi,
+            huv_kondisisistemremutama,
+            huv_kondisipenutuplampudanalatpantulcahaya,
+            huv_kondisipanelinstrumentdashboard,
+            huv_kondisikacaspion,
+            huv_kondisispakbor,
+            huv_bentukbumper,
+            huv_keberadaandankondisiperlengkapan,
+            huv_rancanganteknis,
+            huv_keberadaandankondisifasilitastanggapdaruratuntukmobilbus,
+            huv_kondisibadankacaengseltempatdudukmbarangbakmuatantertutup,
+            hum_kondisipenerusdaya,
+            hum_sudutbebaskemudi,
+            hum_kondisiremparkir,
+            hum_fungsilampudanalatpantulcahaya,
+            hum_fungsipenghapuskaca,
+            hum_tingkatkegelapankaca,
+            hum_fungsiklakson,
+            hum_kondisidanfungsisabukkeselamatan,
+            hum_ukurankendaraan,
+            hum_ukurantempatdudukdanbagiandalamkendaraanuntukmobilbus,
+            alatuji_emisiasapbahanbakarsolar,
+            alatuji_emisicobahanbakarbensin,
+            alatuji_emisihcbahanbakarbensin,
+            alatuji_remutamatotalgayapengereman,
+            alatuji_remutamaselisihgayapengeremanrodakirikanan1,
+            alatuji_remutamaselisihgayapengeremanrodakirikanan2,
+            alatuji_remutamaselisihgayapengeremanrodakirikanan3,
+            alatuji_remutamaselisihgayapengeremanrodakirikanan4,
+            alatuji_remparkirtangan,
+            alatuji_remparkirkaki,
+            alatuji_kincuprodadepan,
+            alatuji_tingkatkebisingan,
+            alatuji_lampuutamakekuatanpancarlampukanan,
+            alatuji_lampuutamakekuatanpancarlampukiri,
+            alatuji_lampuutamapenyimpanganlampukanan,
+            alatuji_lampuutamapenyimpanganlampukiri,
+            alatuji_penunjukkecepatan,
+            alatuji_kedalamanalurban,
+            masaberlakuuji,
+            tgluji,
+            statuslulusuji) VALUES 
+            ('$statuspenerbitan',
+            '$nouji',
+            '$nama',
+            '$alamat',
+            '$noidentitaspemilik',
+            '$nosertifikatreg',
+            '$tglsertifikatreg',
+            '$noregistrasikendaraan',
+            '$norangka',
+            '$nomesin',
+            '$merek',
+            '$tipe',
+            '$jenis',
+            '$thpembuatan',
+            '$bahanbakar',
+            '$isisilinder',
+            '$dayamotorpenggerak',
+            '$jbb',
+            '$jbkb',
+            '$jbi',
+            '$jbki',
+            '$mst',
+            '$beratkosong',
+            '$konfigurasisumburoda',
+            '$ukuranban',
+            '$panjangkendaraan',
+            '$lebarkendaraan',
+            '$tinggikendaraan',
+            '$panjangbakatautangki',
+            '$lebarbakatautangki',
+            '$tinggibakatautangki',
+            '$julurdepan',
+            '$julurbelakang',
+            '$jaraksumbu1_2',
+            '$jaraksumbu2_3',
+            '$jaraksumbu3_4',
+            '$dayaangkutorang',
+            '$dayaangkutbarang',
+            '$kelasjalanterendah',
+            $id_petugasuji,
+            $id_kepaladinas,
+            $id_direktur,
+            '$kodewilayah',
+            '$kodewilayahasal',
+            '$huv_nomordankondisirangka',
+            '$huv_nomordantipemotorpenggerak',
+            '$huv_kondisitangkicorongdanpipabahanbakar',
+            '$huv_kondisiconverterkit',
+            '$huv_kondisidanposisipipapembuangan',
+            '$huv_ukurandankondisiban',
+            '$huv_kondisisistemsuspensi',
+            '$huv_kondisisistemremutama',
+            '$huv_kondisipenutuplampudanalatpantulcahaya',
+            '$huv_kondisipanelinstrumentdashboard',
+            '$huv_kondisikacaspion',
+            '$huv_kondisispakbor',
+            '$huv_bentukbumper',
+            '$huv_keberadaandankondisiperlengkapan',
+            '$huv_rancanganteknis',
+            '$huv_keberadaandankondisifasilitastanggapdaruratuntukmobilbus',
+            '$huv_kondisibadankacaengseltempatdudukmbarangbakmuatantertutup',
+            '$hum_kondisipenerusdaya',
+            '$hum_sudutbebaskemudi',
+            '$hum_kondisiremparkir',
+            '$hum_fungsilampudanalatpantulcahaya',
+            '$hum_fungsipenghapuskaca',
+            '$hum_tingkatkegelapankaca',
+            '$hum_fungsiklakson',
+            '$hum_kondisidanfungsisabukkeselamatan',
+            '$hum_ukurankendaraan',
+            '$hum_ukurantempatdudukdanbagiandalamkendaraanuntukmobilbus',
+            '$alatuji_emisiasapbahanbakarsolar',
+            '$alatuji_emisicobahanbakarbensin',
+            '$alatuji_emisihcbahanbakarbensin',
+            '$alatuji_remutamatotalgayapengereman',
+            '$alatuji_remutamaselisihgayapengeremanrodakirikanan1',
+            '$alatuji_remutamaselisihgayapengeremanrodakirikanan2',
+            '$alatuji_remutamaselisihgayapengeremanrodakirikanan3',
+            '$alatuji_remutamaselisihgayapengeremanrodakirikanan4',
+            '$efisiensi_remparkir_tangan',
+            '$efisiensi_remparkir_kaki',
+            '$alatuji_kincuprodadepan',
+            '$alatuji_tingkatkebisingan',
+            '$alatuji_lampuutamakekuatanpancarlampukanan',
+            '$alatuji_lampuutamakekuatanpancarlampukiri',
+            '$alatuji_lampuutamapenyimpanganlampukanan',
+            '$alatuji_lampuutamapenyimpanganlampukiri',
+            '$alatuji_penunjukkecepatan',
+            '$alatuji_kedalamanalurban',
+            '$masaberlakuuji',
+            '$tgluji',
+            '$statuslulusuji')";
             Yii::app()->db->createCommand($sql)->execute();
         } else {
             $sql = "UPDATE datapengujian SET 
@@ -462,10 +1029,10 @@ class PrinthasilController extends Controller
             dayaangkutorang = '$dayaangkutorang',
             dayaangkutbarang = '$dayaangkutbarang',
             kelasjalanterendah = '$kelasjalanterendah',
-            idpetugasuji = '$idpetugasuji',
-            idkepaladinas = '$idkepaladinas',
-            iddirektur = '$iddirektur',
-            kodewilayah = 'PMKSN',
+            idpetugasuji = '$id_petugasuji',
+            idkepaladinas = '$id_kepaladinas',
+            iddirektur = '$id_direktur',
+            kodewilayah = '$kodewilayah',
             kodewilayahasal = '$kodewilayahasal',
             huv_nomordankondisirangka = 1,
             huv_nomordantipemotorpenggerak = 1,
@@ -502,8 +1069,8 @@ class PrinthasilController extends Controller
             alatuji_remutamaselisihgayapengeremanrodakirikanan2 = '$alatuji_remutamaselisihgayapengeremanrodakirikanan2',
             alatuji_remutamaselisihgayapengeremanrodakirikanan3 = '$alatuji_remutamaselisihgayapengeremanrodakirikanan3',
             alatuji_remutamaselisihgayapengeremanrodakirikanan4 = '$alatuji_remutamaselisihgayapengeremanrodakirikanan4',
-            alatuji_remparkirtangan = '$alatuji_remparkirtangan',
-            alatuji_remparkirkaki = '$alatuji_remparkirkaki',
+            alatuji_remparkirtangan = '$efisiensi_remparkir_tangan',
+            alatuji_remparkirkaki = '$efisiensi_remparkir_tangan',
             alatuji_kincuprodadepan = '$alatuji_kincuprodadepan',
             alatuji_tingkatkebisingan = '$alatuji_tingkatkebisingan',
             alatuji_lampuutamakekuatanpancarlampukanan = '$alatuji_lampuutamakekuatanpancarlampukanan',

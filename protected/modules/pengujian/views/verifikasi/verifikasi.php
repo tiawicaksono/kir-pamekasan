@@ -330,17 +330,17 @@ $cs->registerScriptFile($baseJs . '/bootstrap-select.js', CClientScript::POS_END
                     align: 'center'
                 },
                 {
-                    field: 'rem',
+                    field: 'lampu',
                     width: 80,
-                    title: 'Brake',
+                    title: 'Lampu',
                     sortable: false,
                     halign: 'center',
                     align: 'center'
                 },
                 {
-                    field: 'lampu',
+                    field: 'rem',
                     width: 80,
-                    title: 'Lampu',
+                    title: 'Brake',
                     sortable: false,
                     halign: 'center',
                     align: 'center'
@@ -635,6 +635,28 @@ $cs->registerScriptFile($baseJs . '/bootstrap-select.js', CClientScript::POS_END
             },
             error: function(data) {
                 hidelargeloader();
+                return false;
+            }
+        });
+    }
+
+    function deleteKeteranganTl(id_list_lulus) {
+        $.ajax({
+            url: '<?php echo $this->createUrl('verifikasi/DeleteKeteranganTl'); ?>',
+            type: 'POST',
+            data: {
+                idListLulus: id_list_lulus
+            },
+            dataType: 'JSON',
+            beforeSend: function() {
+                showlargeloader();
+            },
+            success: function(data) {
+                prosesSearch();
+            },
+            error: function(data) {
+                hidelargeloader();
+                prosesSearch();
                 return false;
             }
         });

@@ -20,7 +20,8 @@ return array(
         'application.models.*',
         'application.models.view.*',
         'application.extensions.pdfGrid.*',
-        'application.extensions.yiidompdf.*'
+        'application.extensions.yiidompdf.*',
+        'application.models.master.*',
     ),
     'theme' => 'adminlte',
     'modules' => array(
@@ -158,6 +159,7 @@ return array(
         // database settings are configured in database.php
         'db' => require(dirname(__FILE__) . '/database.php'),
         'db_sms' => require(dirname(__FILE__) . '/database_sms.php'),
+        'dbcoba' => require(dirname(__FILE__) . '/database_coba.php'),
         'errorHandler' => array(
             // use 'site/error' action to display errors
             'errorAction' => YII_DEBUG ? null : 'site/error',
@@ -189,5 +191,7 @@ return array(
         'blnArrayInd' => array("Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agust", "Sep", "Okt", "Nov", "Des"),
         'bulanArrayInd' => array("Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"),
         'hariArrayInd' => array("Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"),
+        'tokenApi' => 'eyJpdiI6IkFWTVVnUU9XOWx0cnFJeWRxOU9KdWc9PSIsInZhbHVlIjoiMmJkQ0Vpa25SdjZBb0NkUTMrRVpWRFVjWDZMa2dlcmFmeGZUL0lOR3VrQzdLMXhDUjN1ZGRvci9oWFNsbDFTejZuL1pnZWNBQXpWM3ozOFp0SEh3REJrNzZxM29TTDFnTlJKdVRtdCtxODJwWGxRV3FCR0hkcGFIM3l1YndSKzYiLCJtYWMiOiJhZWYzNmUzMTcxZmIwOWFmOWZkMDAwZjUyMzUxOThhZmYwNGJjMDk4MjA0YjIyYWZlMjM5ZmQ4NjdjZGYyODk1In0=',
+        'urlApi' => 'https://ujiberkala-middle.kemenhub.go.id/api/v1/global'
     ),
 );

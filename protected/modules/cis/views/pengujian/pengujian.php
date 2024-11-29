@@ -25,14 +25,14 @@ $posisi_cis = Yii::app()->session['posisi_cis'];
                         <?php $this->renderPartial('index_emisi'); ?>
                     </div>
                 <?php } ?>
-                <?php if ($bagian_rem == 'true') { ?>
-                    <div title="REM" style="padding:10px">
-                        <?php $this->renderPartial('index_rem'); ?>
-                    </div>
-                <?php } ?>
                 <?php if ($bagian_lampu == 'true') { ?>
                     <div title="LAMPU" style="padding:10px">
                         <?php $this->renderPartial('index_lampu'); ?>
+                    </div>
+                <?php } ?>
+                <?php if ($bagian_rem == 'true') { ?>
+                    <div title="REM" style="padding:10px">
+                        <?php $this->renderPartial('index_rem'); ?>
                     </div>
                 <?php } ?>
                 <?php if ($bagian_pitlift == 'true') { ?>

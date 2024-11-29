@@ -213,14 +213,7 @@ $cs->registerScriptFile($assetsUrl . '/js/edit_buku.js', CClientScript::POS_END)
         <h3 class="box-title">Data Baru dan Edit Buku</h3>
     </div><!-- /.box-header -->
     <div class="box-body">
-        <div class="easyui-tabs">
-            <div title="EDIT KENDARAAN" style="padding:10px">
-                <?php $this->renderPartial('index_edit'); ?>
-            </div>
-            <div title="KENDARAAN BARU" style="padding:10px">
-                <?php $this->renderPartial('index_baru'); ?>
-            </div>
-        </div>
+        <?php $this->renderPartial('index_edit'); ?>
     </div>
 </div>
 <div id="dlg" class="easyui-dialog" title="Data Riwayat" style="width: 50%; height: 380px; padding: 10px;display: none"

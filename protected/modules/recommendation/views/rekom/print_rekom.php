@@ -170,13 +170,13 @@
                             <td>d.</td>
                             <td>Jenis Kendaraan</td>
                             <td> : </td>
-                            <td><?php echo $dataKendaraan->jenis; ?></td>
+                            <td><?php echo $dataKendaraan->karoseri_jenis; ?></td>
                         </tr>
                         <tr>
                             <td>e.</td>
                             <td>Merk / Tipe / Tahun</td>
                             <td> : </td>
-                            <td><?php echo $dataKendaraan->merk . " / " . $dataKendaraan->tipe . " / " . $dataKendaraan->tahun; ?></td>
+                            <td><?php echo strtoupper($dataKendaraan->merk) . " / " . $dataKendaraan->tipe . " / " . $dataKendaraan->tahun; ?></td>
                         </tr>
                         <tr>
                             <td>f.</td>
@@ -194,7 +194,7 @@
                             <td>h.</td>
                             <td>Bahan Bakar</td>
                             <td> : </td>
-                            <td><?php echo $dataKendaraan->bahan_bakar; ?></td>
+                            <td><?php echo strtoupper($dataKendaraan->bahan_bakar); ?></td>
                         </tr>
                         <tr>
                             <td>i.</td>
@@ -219,7 +219,7 @@
                         Diuji berkala di Dinas Perhubungan Kabupaten Pamekasan sebagai mobil barang (truck/pickup/box) / mobil bis (umum/bukan umum) 
                         untuk angkutan barang dengan menggunakan bak terbuka/tertutup.-->
                     Setelah diadakan penelitian dapat memenuhi syarat kendaraan wajib uji untuk : <br />
-                    Diuji berkala di Dinas Perhubungan Kabupaten Pamekasan sebagai <?php echo $dataKendaraan->nm_komersil . ' ( ' . $dataKendaraan->jenis . ' - ' . $dataKendaraan->sifat . ' )'; ?>
+                    Diuji berkala di Dinas Perhubungan Kabupaten Pamekasan sebagai <?php echo $dataKendaraan->nm_komersil . ' - ' . $dataKendaraan->sifat; ?>
                 </li>
                 <li style="margin-top: 30px">
                     Demikian surat keterangan ini dibuat untuk dapat dipergunakan sebagaimana mestinya.

@@ -95,7 +95,7 @@ $cs->registerScriptFile($assetsUrl . '/js/jquery.numeric.js', CClientScript::POS
                                     <div class="input-group-addon">%</div>
                                 </div>
                             </td>
-                            <td>Max = 100 %</td>
+                            <td>Min = 50 %</td>
                             <td></td>
                             <td>
                                 <div class="input-group">
@@ -128,7 +128,7 @@ $cs->registerScriptFile($assetsUrl . '/js/jquery.numeric.js', CClientScript::POS
                                     <div class="input-group-addon">%</div>
                                 </div>
                             </td>
-                            <td>Max = 100 %</td>
+                            <td>Min = 50 %</td>
                             <td></td>
                             <td>
                                 <div class="input-group">
@@ -161,7 +161,7 @@ $cs->registerScriptFile($assetsUrl . '/js/jquery.numeric.js', CClientScript::POS
                                     <div class="input-group-addon">%</div>
                                 </div>
                             </td>
-                            <td>Max = 100 %</td>
+                            <td>Min = 50 %</td>
                             <td></td>
                             <td>
                                 <div class="input-group">
@@ -194,7 +194,7 @@ $cs->registerScriptFile($assetsUrl . '/js/jquery.numeric.js', CClientScript::POS
                                     <div class="input-group-addon">%</div>
                                 </div>
                             </td>
-                            <td>Max = 100 %</td>
+                            <td>Min = 50 %</td>
                             <td></td>
                             <td>
                                 <div class="input-group">
@@ -203,6 +203,44 @@ $cs->registerScriptFile($assetsUrl . '/js/jquery.numeric.js', CClientScript::POS
                                 </div>
                             </td>
                             <td>Max = 8 %</td>
+                        </tr>
+                        <tr>
+                            <td>5. REM PARKIR TANGAN </td>
+                            <td>
+                                <input type="hidden" id="form_efisiensi_tangan" />
+                                <input onkeyup="perhitunganRemParkir()" class="form-control" type="text" id="tangan_kiri" value="" size="8" maxlength="8" />
+                            </td>
+                            <td></td>
+                            <td>
+                                <input onkeyup="perhitunganRemParkir()" class="form-control" type="text" id="tangan_kanan" value="" size="8" maxlength="8" />
+                            </td>
+                            <td colspan="6">
+                                Efisiensi = <span id="efisiensi_tangan" style="font-weight: bold; color: red; font-size: 14px;">0</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>6. REM PARKIR KAKI </td>
+                            <td>
+                                <input type="hidden" id="form_efisiensi_kaki" />
+                                <input onkeyup="perhitunganRemParkir()" class="form-control" type="text" id="kaki_kiri" value="" size="8" maxlength="8" />
+                            </td>
+                            <td></td>
+                            <td>
+                                <input onkeyup="perhitunganRemParkir()" class="form-control" type="text" id="kaki_kanan" value="" size="8" maxlength="8" />
+
+                            </td>
+                            <td colspan="6">
+                                Efisiensi = <span id="efisiensi_kaki" style="font-weight: bold; color: red; font-size: 14px;">0</span>
+
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>&nbsp;</td>
+                            <td colspan="9" style="color: red;">
+                                <input type="hidden" id="jbb" />
+                                (totalparkir/jbb) * 100%<br />
+                                M.Barang min. 12% | M.Penumpang min.16%
+                            </td>
                         </tr>
                         <tr>
                             <td colspan="10">&nbsp;</td>
@@ -242,14 +280,6 @@ $cs->registerScriptFile($assetsUrl . '/js/jquery.numeric.js', CClientScript::POS
                                 </label>
                             </td>
                             <td colspan="7">&nbsp;</td>
-                        </tr>
-                        <tr>
-                            <td>Rem parkir</td>
-                            <td colspan="2">
-                                <label>
-                                    <input id="g34" type="checkbox" class="flat-red"> Tidak Berfungsi
-                                </label>
-                            </td>
                         </tr>
                     </table>
                 </div>
@@ -370,6 +400,13 @@ $cs->registerScriptFile($assetsUrl . '/js/jquery.numeric.js', CClientScript::POS
                     sortable: false,
                     align: 'center'
                 },
+                {
+                    field: 'jbb',
+                    title: 'JBB',
+                    width: 70,
+                    sortable: false,
+                    align: 'center'
+                },
             ]
         ],
         //        toolbar: "#search",
@@ -385,6 +422,27 @@ $cs->registerScriptFile($assetsUrl . '/js/jquery.numeric.js', CClientScript::POS
         //        onLoadSuccess: function () {
         //        }
     });
+
+    function perhitunganRemParkir(){
+        var var_tangan_kiri= $('#tangan_kiri').val()*100;
+        var var_tangan_kanan= $('#tangan_kanan').val()*100;
+        var var_kaki_kiri= $('#kaki_kiri').val()*100;
+        var var_kaki_kanan= $('#kaki_kanan').val()*100;
+        var jbb= $('#jbb').val();
+        var tangan_kiri = parseInt(var_tangan_kiri ?? 0);
+        var tangan_kanan = parseInt(var_tangan_kanan ?? 0);
+        var kaki_kiri = parseInt(var_kaki_kiri ?? 0);
+        var kaki_kanan = parseInt(var_kaki_kanan ?? 0);
+        total_kaki = Math.ceil((kaki_kiri+kaki_kanan)/jbb);
+        total_tangan = Math.ceil((tangan_kiri+tangan_kanan)/jbb);
+        if(var_kaki_kiri=='' || var_kaki_kanan==''){
+            total_kaki = 0;
+        }
+        $('#form_efisiensi_kaki').val(total_kaki);
+        $('#efisiensi_kaki').text(total_kaki);
+        $('#form_efisiensi_tangan').val(total_tangan);
+        $('#efisiensi_tangan').text(total_tangan);
+    }
 
     function perhitungan() {
         var prosentase_total = 0;
@@ -460,13 +518,13 @@ $cs->registerScriptFile($assetsUrl . '/js/jquery.numeric.js', CClientScript::POS
         }
         //---------------------------------------------------
 
-        $('#bsb1').val(prosentase_total_sumbu1.toFixed(0));
-        $('#bsb2').val(prosentase_total_sumbu2.toFixed(0));
-        $('#bsb3').val(prosentase_total_sumbu3.toFixed(0));
-        $('#bsb4').val(prosentase_total_sumbu4.toFixed(0));
-        $('#bsel1').val(prosentase_selisih_sumbu1.toFixed(0));
-        $('#bsel2').val(prosentase_selisih_sumbu2.toFixed(0));
-        $('#bsel3').val(prosentase_selisih_sumbu3.toFixed(0));
-        $('#bsel4').val(prosentase_selisih_sumbu4.toFixed(0));
+        $('#bsb1').val(isNaN(prosentase_total_sumbu1.toFixed(0)) ? 0 : prosentase_total_sumbu1.toFixed(0));
+        $('#bsb2').val(isNaN(prosentase_total_sumbu2.toFixed(0)) ? 0 : prosentase_total_sumbu2.toFixed(0));
+        $('#bsb3').val(isNaN(prosentase_total_sumbu3.toFixed(0)) ? 0 : prosentase_total_sumbu3.toFixed(0));
+        $('#bsb4').val(isNaN(prosentase_total_sumbu4.toFixed(0)) ? 0 : prosentase_total_sumbu4.toFixed(0));
+        $('#bsel1').val(isNaN(prosentase_selisih_sumbu1.toFixed(0)) ? 0 : prosentase_selisih_sumbu1.toFixed(0));
+        $('#bsel2').val(isNaN(prosentase_selisih_sumbu2.toFixed(0)) ? 0 : prosentase_selisih_sumbu2.toFixed(0));
+        $('#bsel3').val(isNaN(prosentase_selisih_sumbu3.toFixed(0)) ? 0 : prosentase_selisih_sumbu3.toFixed(0));
+        $('#bsel4').val(isNaN(prosentase_selisih_sumbu4.toFixed(0)) ? 0 : prosentase_selisih_sumbu4.toFixed(0));
     }
 </script>

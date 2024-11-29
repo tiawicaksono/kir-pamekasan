@@ -205,29 +205,27 @@ class EditbukuController extends Controller
             $data['nomer_chasis'] = $data_kendaraan->no_chasis;
             $data['jenis_kendaraan'] = $data_kendaraan->id_jns_kend;
             $data['status_kendaraan'] = ($data_kendaraan->umum == 'true') ? 'UMUM' : 'BUKAN UMUM';
-            //        $data['merk'] = $data_kendaraan->id_merk;
-            $data['merk'] = $data_kendaraan->merk;
+            $data['merk'] = $data_kendaraan->vehicle_brand_id;
             $data['tipe'] = $data_kendaraan->tipe;
             $data['pengimport'] = $data_kendaraan->pengimport;
             $data['isi_silinder'] = $data_kendaraan->isi_silinder;
             $data['daya_motor'] = $data_kendaraan->daya_motor;
-            $data['bahan_bakar'] = $data_kendaraan->bahan_bakar;
+            $data['bahan_bakar'] = $data_kendaraan->fuel_id;
             $data['ukuran_panjang'] = $data_kendaraan->ukuran_panjang;
             $data['ukuran_lebar'] = $data_kendaraan->ukuran_lebar;
             $data['ukuran_tinggi'] = $data_kendaraan->ukuran_tinggi;
             $data['dimpanjang'] = $data_kendaraan->dimpanjang;
             $data['dimlebar'] = $data_kendaraan->dimlebar;
             $data['dimtinggi'] = $data_kendaraan->dimtinggi;
-            //        $data['nm_komersil'] = $data_kendaraan->id_nm_komersil;
-            $data['nm_komersil'] = $data_kendaraan->nm_komersil;
+            $data['nm_komersil'] = $data_kendaraan->vehicle_type_sub_id;
+            $data['nm_komersil_lama'] = $data_kendaraan->nm_komersil;
             $data['warna_cabin'] = $data_kendaraan->warna;
             $data['warna_bak'] = $data_kendaraan->warna_bak;
             $data['bagian_belakang'] = $data_kendaraan->bagian_belakang;
             $data['bagian_depan'] = $data_kendaraan->bagian_depan;
             $data['bagian_jterendah'] = $data_kendaraan->bagian_jterendah;
-            //        $data['karoseri_jenis'] = $data_kendaraan->id_kar_jenis;
-            //        $data['karoseri_bahan'] = $data_kendaraan->id_kar_bahan;
-            $data['karoseri_jenis'] = $data_kendaraan->karoseri_jenis;
+            $data['karoseri_jenis'] = $data_kendaraan->vehicle_type_id;
+            $data['karoseri_jenis_lama'] = $data_kendaraan->karoseri_jenis;
             $data['karoseri_bahan'] = $data_kendaraan->karoseri_bahan;
             $data['karoseri_duduk'] = $data_kendaraan->karoseri_duduk;
             $data['karoseri_berdiri'] = $data_kendaraan->karoseri_berdiri;
@@ -256,12 +254,19 @@ class EditbukuController extends Controller
             $data['kemjbkb'] = $data_kendaraan->kemjbkb;
             $data['kemorang'] = $data_kendaraan->kemorang;
             $data['kembarang'] = $data_kendaraan->kembarang;
-            $data['kelas_jalan'] = $data_kendaraan->kls_jln;
+            $data['kelas_jalan'] = $data_kendaraan->kelasjalan_id;
             $data['ukq'] = $data_kendaraan->ukq;
             $data['ukp'] = $data_kendaraan->ukp;
             $data['ukp2'] = $data_kendaraan->ukp2;
             $data['mst'] = $data_kendaraan->mst;
             $data['no_telepon'] = $data_kendaraan->no_telp;
+            $data['kelasjalan_id'] = $data_kendaraan->kelasjalan_id;
+            $data['fuel_id'] = $data_kendaraan->fuel_id;
+            $data['vehicle_brand_id'] = $data_kendaraan->vehicle_brand_id;
+            $data['vehicle_varian_id'] = $data_kendaraan->vehicle_varian_id;
+            $data['vehicle_varian_type_id'] = $data_kendaraan->vehicle_varian_type_id;
+            $data['vehicle_type_id'] = $data_kendaraan->vehicle_type_id;
+            $data['vehicle_type_sub_id'] = $data_kendaraan->vehicle_type_sub_id;
         }
         echo json_encode($data);
     }
@@ -327,7 +332,7 @@ class EditbukuController extends Controller
         } else if ($count == 0) {
             $results = VKendaraan::model()->find($criteria);
             $id_kendaran = $results['id_kendaraan'];
-            $count = count($results);
+            $count = count($id_kendaran);
         }
         $data['hasil'] = $count;
         $data['id_kendaraan'] = $id_kendaran;
@@ -415,28 +420,41 @@ class EditbukuController extends Controller
         $tahun = empty($_POST['tahun']) ? '0' : $_POST['tahun'];
         $nomer_mesin = str_replace("'", "`", strtoupper($_POST['nomer_mesin']));
         $nomer_chasis = str_replace("'", "`", strtoupper($_POST['nomer_chasis']));
-        $id_jns_kend = intval($_POST['jenis_kendaraan']);
-        $jenis_kendaraan = TblJnsKend::model()->findByAttributes(array('id_jns_kend' => $id_jns_kend))->jns_kend;
+        // $id_jns_kend = intval($_POST['jenis_kendaraan']);
+        // $jenis_kendaraan = TblJnsKend::model()->findByAttributes(array('id_jns_kend' => $id_jns_kend))->jns_kend;
+        $id_jns_kend = 0;
+        $jenis_kendaraan = '-';
         $status_kendaraan = $_POST['status_kendaraan'];
-        $merk = strtoupper($_POST['merk']);
-        $tipe = strtoupper($_POST['tipe']);
+        $merk_id = $_POST['merk'];
+        $result_merk = MasterMerk::model()->findByPk($merk_id);
+        $merk = $result_merk->vehicle_brand_name;
+        $tipe_id = $_POST['tipe'];
+        $result_tipe = MasterMerkTipe::model()->findByPk($tipe_id);
+        $tipe = $result_tipe->vehicle_varian_type_name;
+        $tipe_sub_id = MasterMerkTipeSub::model()->findByAttributes(array('vehicle_varian_type_id' => $tipe_id))->vehicle_varian_id;
         $pengimport = str_replace("'", "`", strtoupper($_POST['pengimport']));
         $isi_silinder = $_POST['isi_silinder'];
         $daya_motor = $_POST['daya_motor'];
-        $bahan_bakar = $_POST['bahan_bakar'];
+        $bahan_bakar_id = $_POST['bahan_bakar'];
+        $result_bahan_bakar = MasterBahanBakar::model()->findByPk($bahan_bakar_id);
+        $bahan_bakar = $result_bahan_bakar->fuel_name;
         $panjang_utama = $_POST['panjang_utama'];
         $lebar_utama = $_POST['lebar_utama'];
         $tinggi_utama = $_POST['tinggi_utama'];
         $panjang_muatan = $_POST['panjang_muatan'];
         $lebar_muatan = $_POST['lebar_muatan'];
         $tinggi_muatan = $_POST['tinggi_muatan'];
-        $nama_komersil = strtoupper($_POST['nama_komersil']);
+        $nama_komersil_id = $_POST['nama_komersil'];
+        $result_nama_komersil = MasterVehicleTypeSub::model()->findByPk($nama_komersil_id);
+        $nama_komersil = $result_nama_komersil->vehicle_sub_name;
         $warna_cabin = str_replace("'", "`", strtoupper($_POST['warna_cabin']));
         $warna_bak = str_replace("'", "`", strtoupper($_POST['warna_bak']));
         $kebelakang = $_POST['kebelakang'];
         $kedepan = $_POST['kedepan'];
         $jarak_terendah = $_POST['jarak_terendah'];
-        $karoseri_jenis = $_POST['karoseri_jenis'];
+        $karoseri_jenis_id = $_POST['karoseri_jenis'];
+        $result_karoseri_jenis = MasterVehicleType::model()->findByPk($karoseri_jenis_id);
+        $karoseri_jenis = $result_karoseri_jenis->vehicle_type_name;
         $karoseri_bahan = strtoupper($_POST['karoseri_bahan']);
         $tempat_duduk = $_POST['tempat_duduk'];
         $berdiri = $_POST['berdiri'];
@@ -465,8 +483,9 @@ class EditbukuController extends Controller
         $jbkb = $_POST['jbkb'];
         $daya_angkut_orang = $_POST['daya_angkut_orang'];
         $daya_angkut_barang = $_POST['daya_angkut_barang'];
-        $kelas_jalan = $_POST['kelas_jalan'];
-        //        $kelas_jalan = '';
+        $kelas_jalan_id = $_POST['kelas_jalan'];
+        $result_kelas_jalan = MasterKelasJalan::model()->findByPk($kelas_jalan_id);
+        $kelas_jalan = $result_kelas_jalan->kelasjalan_name;
         $q_r = $_POST['q_r'];
         $p1 = $_POST['p1'];
         $p2 = $_POST['p2'];
@@ -475,7 +494,7 @@ class EditbukuController extends Controller
         $createdby = '';
         $no_telepon = $_POST['no_telepon'];
 
-        $dataKendaraan = $nomer_uji . '~' . $merk . '~' . $tipe . '~' . $tahun . '~' . $jenis_kendaraan . '~' . $awal_pemakaian . '~' . $nomer_chasis . '~' . $nomer_mesin . '~' . $nama_pemilik . '~' . $identitas . '~' . $nomer_identitas . '~' . $alamat_pemilik . '~' . $nomer_kendaraan . '~' . $created . '~' . $createdby . '~' . $status_kendaraan . '~' . $tempat_lahir . '~' . $tgl_lahir . '~' . $kelamin . '~' . $rt . '~' . $rw . '~' . $kelurahan . '~' . $kecamatan . '~' . $kota . '~' . $propinsi . '~' . $pengimport . '~' . $id_jns_kend . '~' . $no_telepon . '~' . $id_provinsi . '~' . $id_kota . '~' . $id_kecamatan . '~' . $id_kelurahan;
+        $dataKendaraan = $nomer_uji . '~' . $merk . '~' . $tipe . '~' . $tahun . '~' . $jenis_kendaraan . '~' . $awal_pemakaian . '~' . $nomer_chasis . '~' . $nomer_mesin . '~' . $nama_pemilik . '~' . $identitas . '~' . $nomer_identitas . '~' . $alamat_pemilik . '~' . $nomer_kendaraan . '~' . $created . '~' . $createdby . '~' . $status_kendaraan . '~' . $tempat_lahir . '~' . $tgl_lahir . '~' . $kelamin . '~' . $rt . '~' . $rw . '~' . $kelurahan . '~' . $kecamatan . '~' . $kota . '~' . $propinsi . '~' . $pengimport . '~' . $id_jns_kend . '~' . $no_telepon . '~' . $id_provinsi . '~' . $id_kota . '~' . $id_kecamatan . '~' . $id_kelurahan . '~' . $merk_id . '~' . $tipe_id . '~' . $tipe_sub_id . '~' . $bahan_bakar_id . '~' . $karoseri_jenis_id . '~' . $nama_komersil_id . '~' . $kelas_jalan_id;
         $dataSertifikasi = $nomer_sertifikasi_registrasi . '~' . $diterbitkan_nomer_sertifikasi_registrasi . '~' . $tgl_nomer_sertifikasi_registrasi . '~' . $nomer_sertifikasi_uji . '~' . $diterbitkan_nomer_sertifikasi_uji . '~' . $tgl_nomer_sertifikasi_uji . '~' . $nomer_sertifikasi_rancang . '~' . $diterbitkan_nomer_sertifikasi_rancang . '~' . $tgl_nomer_sertifikasi_rancang;
         $dataType = $warna_cabin . '~' . $isi_silinder . '~' . $daya_motor . '~' . $bahan_bakar . '~' . $panjang_utama . '~' . $lebar_utama . '~' . $tinggi_utama . '~' . $kebelakang . '~' . $kedepan . '~' . $jarak_terendah . '~' . $karoseri_jenis . '~' . $karoseri_bahan . '~' . $tempat_duduk . '~' . $berdiri . '~' . $jarak_sumbu_1 . '~' . $jarak_sumbu_2 . '~' . $jarak_sumbu_3 . '~' . $jarak_sumbu_4 . '~' . $berat_kendaraan_sumbu_1 . '~' . $berat_kendaraan_sumbu_2 . '~' . $berat_kendaraan_sumbu_3 . '~' . $berat_kendaraan_sumbu_4 . '~' . $berat_kendaraan_sumbu_5 . '~' . $pemakaian_sumbu_ban_1 . '~' . $pemakaian_sumbu_ban_2 . '~' . $pemakaian_sumbu_ban_3 . '~' . $pemakaian_sumbu_ban_4 . '~' . $pemakaian_sumbu_ban_5 . '~' . $panjang_muatan . '~' . $lebar_muatan . '~' . $tinggi_muatan . '~' . $jbb . '~' . $jbkb . '~' . $daya_angkut_orang . '~' . $daya_angkut_barang . '~' . $nama_komersil . '~' . $tipe . '~' . $kelas_jalan . '~' . $p1 . '~' . $q_r . '~' . $p2 . '~' . $konfigurasi_sumbu . '~' . $daya_dukung_pabrik_1 . '~' . $daya_dukung_pabrik_2 . '~' . $daya_dukung_pabrik_3 . '~' . $daya_dukung_pabrik_4 . '~' . $daya_dukung_pabrik_5 . '~' . $warna_bak . '~' . $peng_khusus . '~' . $mst;
         $updateBuku = "Select in_up_data_kendaraan('" . $dataKendaraan . "','" . $dataSertifikasi . "','" . $dataType . "',$idKendaraan)";
@@ -772,6 +791,36 @@ class EditbukuController extends Controller
         $option = '';
         foreach ($kelurahan as $data) :
             $option .= "<option value='$data->id_kelurahan'>$data->nama</pilih>";
+        endforeach;
+
+        echo $option;
+    }
+
+    public function actionSelectVehicleType()
+    {
+        $id = $_POST['id'];
+        $criteria = new CDbCriteria();
+        $criteria->addCondition("vehicle_type_id = $id");
+        $criteria->order = 'vehicle_sub_name asc';
+        $result = MasterVehicleTypeSub::model()->findAll($criteria);
+        $option = '';
+        foreach ($result as $data) :
+            $option .= "<option value='$data->vehicle_sub_id'>$data->vehicle_sub_name</pilih>";
+        endforeach;
+
+        echo $option;
+    }
+
+    public function actionSelectBrandType()
+    {
+        $id = $_POST['id'];
+        $criteria = new CDbCriteria();
+        $criteria->addCondition("vehicle_brand_id = $id");
+        $criteria->order = 'vehicle_varian_type_name asc';
+        $result = MasterMerkTipe::model()->findAll($criteria);
+        $option = '';
+        foreach ($result as $data) :
+            $option .= "<option value='$data->vehicle_varian_type_id'>$data->vehicle_varian_type_name</pilih>";
         endforeach;
 
         echo $option;
